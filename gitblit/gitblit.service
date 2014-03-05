@@ -1,0 +1,14 @@
+[Unit]
+Description=GitBlit service
+Wants=etcd.service
+Requires=docker.service
+
+[Service]
+ExecStartPre=/bin/sh -c '/usr/bin/docker rm gitblit || exit 0'
+ExecStart=/usr/bin/docker run -name gitblit -v=/var/lib/gitblit/data:/opt/gitblit/data -p=8443:8443 -p 8444:8444 -p 9418:9418 -w=/opt/gitblit tgulacsi/gitblit /sbin/my_init
+ExecStartPost=/bin/sh -c /usr/bin/etcdctl set /domains/unosoft.local/gitblit "$(ifconfig $(sed -ne '/^e/ s/:.*$//p' /proc/net/dev) | awk '/inet /{print $2}'):8443"
+ExecStopPost=/usr/bin/etcdctl delete /domains/unosoft.local/gitblit
+Restart=always
+
+[Install]
+WantedBy=local.target

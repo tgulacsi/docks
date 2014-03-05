@@ -1,0 +1,14 @@
+[Unit]
+Description=IPThermo service
+Wants=etcd.service
+Requires=docker.service
+
+[Service]
+ExecStartPre=/bin/sh -c '/usr/bin/docker rm ipthermo || exit 0'
+ExecStart=/usr/bin/docker run -name ipthermo -v=/var/lib/ipthermo:/var/lib/ipthermo -p=25231:25231 -w=/var/lib/ipthermo tgulacsi/ipthermo /sbin/my_init
+ExecStartPost=/bin/sh -c /usr/bin/etcdctl set /domains/unosoft.local/ipthermo "$(ifconfig $(sed -ne '/^e/ s/:.*$//p' /proc/net/dev) | awk '/inet /{print $2}'):25231"
+ExecStopPost=/usr/bin/etcdctl delete /domains/unosoft.local/ipthermo
+Restart=always
+
+[Install]
+WantedBy=local.target
