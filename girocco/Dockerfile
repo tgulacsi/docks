@@ -10,8 +10,8 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install -y gitweb netcat-openbsd git-
 # Clean up APT when done.
 RUN DEBIAN_FRONTEND=noninteractive apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-RUN DN=/etc/service/taskd ; mkdir -p $DN && echo '#!/bin/sh -e\nexec sudo -u repo /home/repo/repomgr/taskd/taskd.pl' >$DN/run && chmod 0755 $DN/run
-RUN DN=/etc/service/jobd ; mkdir -p $DN && echo '#!/bin/sh -e\nexec sudo -u repo /home/repo/repomgr/jobd/jobd.sh' >$DN/run && chmod 0755 $DN/run
+RUN DN=/etc/service/taskd ; mkdir -p $DN && echo '#!/bin/sh -e\ncd '$DN'\nexec sudo -u repo ./taskd/taskd.pl' >$DN/run && chmod 0755 $DN/run
+RUN DN=/etc/service/jobd ; mkdir -p $DN && echo '#!/bin/sh -e\ncd '$DN'\nexec sudo -u repo ./jobd/jobd.sh' >$DN/run && chmod 0755 $DN/run
 
 CMD ["/usr/bin/runsvdir", "/etc/service"]
 
