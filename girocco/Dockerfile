@@ -10,9 +10,6 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install -y gitweb netcat-openbsd git-
 # Clean up APT when done.
 RUN DEBIAN_FRONTEND=noninteractive apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-RUN DN=/etc/service/taskd ; mkdir -p $DN && echo '#!/bin/sh -e\ncd '$DN'\nexec sudo -u repo ./taskd/taskd.pl' >$DN/run && chmod 0755 $DN/run
-RUN DN=/etc/service/jobd ; mkdir -p $DN && echo '#!/bin/sh -e\ncd '$DN'\nexec sudo -u repo ./jobd/jobd.sh' >$DN/run && chmod 0755 $DN/run
-
 CMD ["/usr/bin/runsvdir", "/etc/service"]
 
 RUN adduser repo
@@ -24,13 +21,13 @@ RUN cd /home/repo/upstream && sudo -u repo sh -c 'git submodule update --init &&
 #RUN sed -i -e '/^mknod/ s/^mknod/echo mknod/;/^rm/ s!rm -f dev/null dev/zero dev/random dev/urandom!echo rm -f dev/{null,zero,random,urandom}!' /home/repo/upstream/chrootsetup_linux.sh
 RUN sed -i -e '/ld-linux.so/ s!^![ -e /lib/ld-linux.so.2 ] \&\& !;/lib64/ s!/lib64!/lib/x86_64-linux-gnu!g' /home/repo/upstream/chrootsetup_linux.sh
 
-##
-## surely this will error out with mknod
-## start it with docker --privileged=true
-##
-##
-RUN cd /home/repo/upstream && make install
-
 RUN DN=/etc/service/apache ; mkdir -p $DN && echo '#!/bin/sh -e\n/etc/init.d/apache2 restart\npid=$(cat /run/apache2/apache2.pid)\nwhile [ -e /proc/$pid ]; do sleep 30; done' >$DN/run && chmod 0755 $DN/run
+RUN DN=/etc/service/taskd ; mkdir -p $DN && echo '#!/bin/sh -e\ncd /home/repo/repomgr\nexec sudo -u repo ./taskd/taskd.pl' >$DN/run && chmod 0755 $DN/run
+RUN DN=/etc/service/jobd ; mkdir -p $DN && echo '#!/bin/sh -e\ncd /home/repo/repomgr\nexec sudo -u repo ./jobd/jobd.sh' >$DN/run && chmod 0755 $DN/run
 
-# run with -v=/var/lib/girocco:/srv/repo -p 2244:2244
+RUN ln -s /home/repo/upstream/apache.conf /etc/apache2/sites-available/repo.conf && a2enmod rewrite && a2dissite 000-default.conf && a2ensite repo.conf
+
+##
+## the following needs --privileged=true
+##
+# RUN cd /home/repo/upstream && make install
