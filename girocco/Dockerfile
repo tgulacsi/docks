@@ -25,6 +25,7 @@ RUN DN=/etc/service/apache ; mkdir -p $DN && echo '#!/bin/sh -e\n/etc/init.d/apa
 RUN DN=/etc/service/taskd ; mkdir -p $DN && echo '#!/bin/sh -e\ncd /home/repo/repomgr\nexec sudo -u repo ./taskd/taskd.pl' >$DN/run && chmod 0755 $DN/run
 RUN DN=/etc/service/jobd ; mkdir -p $DN && echo '#!/bin/sh -e\ncd /home/repo/repomgr\nexec sudo -u repo ./jobd/jobd.sh' >$DN/run && chmod 0755 $DN/run
 
+ADD apache.conf /home/repo/upstream/apache.conf
 RUN ln -s /home/repo/upstream/apache.conf /etc/apache2/sites-available/repo.conf && a2enmod rewrite && a2dissite 000-default.conf && a2ensite repo.conf
 
 ##
