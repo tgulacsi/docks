@@ -22,13 +22,13 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install -y openjdk-7-jre-headless sud
 RUN DEBIAN_FRONTEND=noninteractive apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 
-ADD http://gerrit-releases.storage.googleapis.com/gerrit-2.8.1.war /tmp/gerrit.war
+ADD http://gerrit-releases.storage.googleapis.com/gerrit-2.8.3.war /tmp/gerrit.war
 
 RUN SD=/etc/service/gerrit; mkdir -p $SD && echo '#!/bin/sh -e\ncd '"$HOME"'\nexec ./gerrit/gerrit.sh live 2>&1 >/var/log/gerrit.log' >$SD/run && chmod 0755 $SD/run
 
 RUN mkdir -p $HOME/gerrit
 RUN chown ${USER}.${USER} $HOME/gerrit
-RUN mv /tmp/gerrit.war $WAR
+RUN mv /tmp/gerrit.war $WAR && chmod 0644 $WAR
 RUN chown -R ${USER}.${USER} $HOME/gerrit
 
 USER gerrit
