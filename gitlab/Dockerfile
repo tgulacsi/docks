@@ -8,8 +8,9 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update
 RUN DEBIAN_FRONTEND=noninteractive apt-get upgrade -y
 
 #RUN curl -o /tmp/gitlab.rpm https://downloads-packages.s3.amazonaws.com/gitlab-6.6.5_omnibus-1.el6.x86_64.rpm
-RUN curl -o /tmp/gitlab.deb https://downloads-packages.s3.amazonaws.com/gitlab_6.6.5-omnibus-1.ubuntu.12.04_amd64.deb
-RUN DEBIAN_FRONTEND=noninteractive dpkg -i /tmp/gitlab.deb
+#RUN curl -o /tmp/gitlab.deb https://downloads-packages.s3.amazonaws.com/gitlab_6.6.5-omnibus-1.ubuntu.12.04_amd64.deb
+ADD gitlab.deb /tmp/gitlab.deb
+RUN DEBIAN_FRONTEND=noninteractive dpkg -i /tmp/gitlab.deb && rm /tmp/gitlab.deb
 
 # Clean up APT when done.
 RUN DEBIAN_FRONTEND=noninteractive apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*

@@ -5,7 +5,7 @@ Requires=docker.service
 
 [Service]
 ExecStartPre=/bin/sh -c '/usr/bin/docker rm postgresql || exit 0'
-ExecStart=/usr/bin/docker run -name postgresql \
+ExecStart=/usr/bin/docker run --name=postgresql --rm=true \
 	-e=HOME=/ \
 	-e=PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
 	-e=LANGUAGE=en_US.UTF-8 -e=LANG=en_US.UTF-8 -e=LC_ALL=en_US.UTF-8 \
