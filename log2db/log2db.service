@@ -1,0 +1,17 @@
+[Unit]
+Description=log2db service
+Wants=etcd.service
+Requires=docker.service
+
+[Service]
+ExecStartPre=/bin/sh -c '/usr/bin/docker rm log2db || exit 0'
+ExecStart=/usr/bin/docker run --name=log2db --rm=true \
+	--link=postgresql:db \
+	-p=8181:8181 -w=/var/lib/log2db -v=/var/lib/log2db:/var/lib/log2db \
+	tgulacsi/log2db /sbin/my_init
+ExecStartPost=/bin/sh -c /usr/bin/etcdctl set /domains/unosoft.local/log2db "$(ifconfig $(sed -ne '/^e/ s/:.*$//p' /proc/net/dev) | awk '/inet /{print $2}'):8181"
+ExecStopPost=/usr/bin/etcdctl delete /domains/unosoft.local/log2db
+Restart=always
+
+[Install]
+WantedBy=local.target
