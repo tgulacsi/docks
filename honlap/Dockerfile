@@ -1,4 +1,5 @@
-FROM phusion/baseimage
+#FROM phusion/baseimage
+FROM debian:testing
 MAINTAINER Tamás Gulácsi <T.Gulacsi@unosoft.hu>
 
 # Disable SSH

@@ -5,7 +5,15 @@ Requires=docker.service
 
 [Service]
 ExecStartPre=/bin/sh -c '/usr/bin/docker rm dokuwiki || exit 0'
-ExecStart=/usr/bin/docker run -name dokuwiki -v=/var/lib/dokuwiki/data:/var/lib/dokuwiki/data:rw -v=/var/lib/dokuwiki/conf:/var/lib/dokuwiki/conf:ro -p=7999:7999 -w=/var/lib/dokuwiki tgulacsi/dokuwiki /sbin/my_init
+ExecStart=/usr/bin/docker run --name dokuwiki \
+	-v=/var/lib/dokuwiki/log:/var/lib/dokuwiki/log:rw \
+	-v=/var/lib/dokuwiki/conf:/var/lib/dokuwiki/conf:rw \
+	-v=/var/lib/dokuwiki/data:/var/lib/dokuwiki/data:rw \
+	-v=/var/lib/dokuwiki:/var/lib/dokuwiki:ro \
+	-p=7999:7999 \
+	-w=/var/lib/dokuwiki \
+	tgulacsi/dokuwiki \
+	/sbin/my_init
 ExecStartPost=/bin/sh -c /usr/bin/etcdctl set /domains/unosoft.local/dokuwiki "$(ifconfig $(sed -ne '/^e/ s/:.*$//p' /proc/net/dev) | awk '/inet /{print $2}'):25231"
 ExecStopPost=/usr/bin/etcdctl delete /domains/unosoft.local/dokuwiki
 Restart=always
