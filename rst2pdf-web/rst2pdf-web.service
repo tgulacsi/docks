@@ -11,4 +11,4 @@ ExecStopPost=/usr/bin/etcdctl delete /domains/unosoft.local/rst2pdf-web
 Restart=always
 
 [Install]
-WantedBy=local.target
+WantedBy=default.target

@@ -19,4 +19,4 @@ ExecStopPost=/usr/bin/etcdctl delete /domains/unosoft.local/dokuwiki
 Restart=always
 
 [Install]
-WantedBy=local.target
+WantedBy=default.target
