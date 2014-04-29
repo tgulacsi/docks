@@ -1,0 +1,18 @@
+#!/bin/sh
+if [ ! -z "${HOSTNAME}" ]; then
+  echo ${HOSTNAME} > /etc/mailname
+  /usr/sbin/postconf -e "myhostname=${HOSTNAME}"
+  /usr/sbin/postconf -e "mydestination=${HOSTNAME}"
+fi
+
+/usr/sbin/postalias hash:/etc/aliases
+
+# Open relay. Wheee!
+/usr/sbin/postconf -e "mynetworks=0.0.0.0/0"
+
+/usr/sbin/postfix -c /etc/postfix stop
+trap '/usr/sbin/postfix stop; exit 0' EXIT QUIT INT TERM
+/usr/sbin/postfix -c /etc/postfix start
+while /usr/sbin/postfix check; do
+    sleep 60
+done
