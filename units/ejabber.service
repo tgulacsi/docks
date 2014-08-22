@@ -1,0 +1,22 @@
+[Unit]
+Description=ejabber service
+Wants=etcd.service
+Requires=docker.service
+
+[Service]
+ExecStartPre=/bin/sh -c '/usr/bin/docker rm ejabber || exit 0'
+ExecStart=/usr/bin/docker run --name ejabber \
+	-v=/var/log/ejabberd:/var/log/ejabberd \
+	-v=/var/lib/ejabberd:/var/lib/ejabberd \
+	-p=5222:5222 \
+	-w=/var/lib/ejabberd \
+	tgulacsi/ejabber \
+	/sbin/my_init
+ExecStartPost=-/usr/bin/etcdctl set /domains/unosoft.local/ejabber/%H:%i running
+ExecStartPost=-/usr/bin/etcdctl set /services/ejabber/%H:%i running
+ExecStopPost=-/usr/bin/etcdctl delete /domains/unosoft.local/ejabber/%H:%i
+ExecStopPost=-/usr/bin/etcdctl delete /services/ejabber/%H:%i
+Restart=always
+
+[Install]
+WantedBy=default.target

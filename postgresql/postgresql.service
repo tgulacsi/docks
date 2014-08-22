@@ -17,8 +17,10 @@ ExecStart=/usr/bin/docker run --name=postgresql --rm=true \
 	/usr/lib/postgresql/9.3/bin/postgres \
 		-D /var/lib/postgresql/9.3/main \
 		-c config_file=/etc/postgresql/9.3/main/postgresql.conf
-ExecStartPost=/bin/sh -c /usr/bin/etcdctl set /domains/unosoft.local/postgresql "$(ifconfig $(sed -ne '/^e/ s/:.*$//p' /proc/net/dev) | awk '/inet /{print $2}'):5432"
-ExecStopPost=/usr/bin/etcdctl delete /domains/unosoft.local/postgresql
+ExecStartPost=-/usr/bin/etcdctl set /domains/unosoft.local/postgresql/%H:%i running
+ExecStartPost=-/usr/bin/etcdctl set /services/postgresql/%H:%i running
+ExecStartPost=-/usr/bin/etcdctl delete /domains/unosoft.local/postgresql/%H:%i running
+ExecStartPost=-/usr/bin/etcdctl delete /services/postgresql/%H:%i running
 Restart=always
 
 [Install]
