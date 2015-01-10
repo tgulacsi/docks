@@ -1,0 +1,10 @@
+#!/bin/sh
+if [ ! -e /var/lib/apt-cacher ]; then
+	mkdir /var/lib/apt-cacher
+fi
+docker kill apt-cacher
+docker rm apt-cacher
+set -x
+exec docker run -a STDIN -a STDOUT -a STDERR -p 3142:3142 --rm --name apt-cacher \
+	-v /var/lib/apt-cacher:/data \
+	tgulacsi/apt-cacher-ng ForeGround=1
